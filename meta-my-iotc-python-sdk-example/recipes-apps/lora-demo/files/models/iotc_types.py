@@ -34,7 +34,8 @@ class IOTCTypes:
 
         elif isinstance(obj, int):
             # or isinstance(obj, numbers.Integral)
-            return cls.guids["INTEGER"]
+            # return cls.guids["INTEGER"]  # will cause error if obj is a float at integer value at instantiation
+            return cls.guids["DECIMAL"]
 
         elif isinstance(obj, dict):
             return cls.guids["OBJECT"]

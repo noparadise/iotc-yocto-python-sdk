@@ -15,12 +15,9 @@ class GenericDevice(object):
     children = None
     attr_ignore_list = ['unique_id']
     tag = 'GenericDevice'
-    attributes_to_send = []
-    attributes_to_exclude = []
 
     def get_attributes_to_send(self):
         return [attribute for attribute in self.attributes_to_send if attribute not in self.attributes_to_exclude]
-
 
     def __init__(self, unique_id, tag=None):
         self.unique_id = unique_id
@@ -29,7 +26,7 @@ class GenericDevice(object):
             self.tag = tag
 
         self.attributes_to_send = []
-        self.attributes_to_exclude = []
+        self.attributes_to_exclude = ['attributes_to_exclude', 'attributes_to_send', 'unique_id', 'name', 'children']
 
     # Not updated
     def for_iotconnect_upload(self):
@@ -116,7 +113,8 @@ class GenericDevice(object):
         return data_obj
 
     def get_state(self):
-        return {attribute: vars(self)[attribute] for attribute in self.get_attributes_to_send() if attribute in vars(self)}
+        # return {attribute: vars(self)[attribute] for attribute in self.get_attributes_to_send() if attribute in vars(self)}
+        return {attribute: vars(self)[attribute] for attribute in vars(self) if attribute not in self.attributes_to_exclude}
 
 
 class ConnectedDevice(GenericDevice):
@@ -136,6 +134,9 @@ class ConnectedDevice(GenericDevice):
         self.SdkClient = None
         self.SdkOptions = sdk_options
         self.sId = sid
+        self.attributes_to_exclude = self.attributes_to_exclude + [
+            "SdkClient", "SdkOptions", "company_id", "Env", "sId", "server_ip"
+        ]
 
     # Not updated
     def template_output(self, iotc_code, iotc_name, auth_type):
@@ -164,8 +165,6 @@ class ConnectedDevice(GenericDevice):
             self.SdkClient = IoTConnectSDK(
                 uniqueId=self.unique_id,
                 sId=self.sId,
-                # self.company_id,
-                # self.Env,
                 sdkOptions=self.SdkOptions,
                 initCallback=None
             )
@@ -214,7 +213,8 @@ class ConnectedDevice(GenericDevice):
         data_array = [self.get_d2c_data()]
         if self.children is not None:
             for child in self.children:
-                data_array.append(child.get_d2c_data())
+                child_data = self.children[child].get_d2c_data()
+                data_array.append(child_data)
         return data_array
 
     def send_device_states(self):
@@ -225,7 +225,6 @@ class ConnectedDevice(GenericDevice):
     def send_d2c(self, data):
         if self.SdkClient is not None:
             res = self.SdkClient.SendData(data)
-            print(res)
         else:
             print("no client")
 
@@ -292,17 +291,16 @@ class ConnectedDevice(GenericDevice):
         self.SdkClient.sendAckCmd(msg[E.Keys.ack], status, message, id_to_send)
 
 
-
 class Gateway(ConnectedDevice):
 
     def __init__(self, company_id, unique_id, environment, sdk_options=None, sid=None):
         super().__init__(company_id, unique_id, environment, sdk_options, sid)
-        self.children: ConnectedDevice = []
+        self.children = {}
 
     def add_child(self, child):
         # print('add child id:', child.name)
-        # self.children[child.unique_id] = child
-        self.children.append(child)
+        self.children[child.unique_id] = child
+        # self.children.append(child)
 
     def show_children(self):
         print(len(self.children), "children")
