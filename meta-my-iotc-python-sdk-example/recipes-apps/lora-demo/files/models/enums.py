@@ -5,6 +5,7 @@ from typing import Union # to use Union[str, None] type hint
 from iotconnect.IoTConnectSDK import MSGTYPE,ErorCode,CMDTYPE,OPTION
 from iotconnect.common.data_evaluation import DATATYPE
 
+
 class Enums:
     class Keys:
         ack = 'ack'
@@ -99,7 +100,6 @@ class Enums:
         Boolean = DATATYPE["Boolean"]
         LatLong = DATATYPE["LatLong"]
         OBJECT = DATATYPE["OBJECT"]
-
 
     @classmethod
     def get_value(cls,msg, key) -> Union[str, None]:

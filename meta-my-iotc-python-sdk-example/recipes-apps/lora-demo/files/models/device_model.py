@@ -3,6 +3,7 @@ from datetime import datetime
 from iotconnect import IoTConnectSDK
 from models.enums import Enums as E
 
+
 def print_msg(title, msg):
     print("{}: \n{}".format(title, json.dumps(msg, indent=2)))
 

@@ -25,8 +25,9 @@ RDEPENDS:${PN} += " python3-requests"
 RDEPENDS:${PN} += " python3-rsa"                      
 RDEPENDS:${PN} += " python3-urllib3"                 
 
-SRC_URI += " file://lora_init_thread.py"
+SRC_URI += " file://lora_demo.py"
 SRC_URI += " file://models"
+SRC_URI += " file://helpers"
 
 
 APP_INSTALL_DIR = "${base_prefix}/usr/bin/local/iotc"
@@ -44,7 +45,18 @@ do_install() {
         fi
     done
 
-    install -m 0755 ${WORKDIR}/lora_init_thread.py ${D}${APP_INSTALL_DIR}/
+    for f in ${WORKDIR}/helpers/*
+    do
+        if [ -f $f ]; then
+            if [ ! -d ${D}${APP_INSTALL_DIR}/helpers ]; then
+                install -d ${D}${APP_INSTALL_DIR}/helpers
+            fi
+            install -m 0755 $f ${D}${APP_INSTALL_DIR}/helpers/
+        fi
+    done
+
+    install -m 0755 ${WORKDIR}/lora_demo.py ${D}${APP_INSTALL_DIR}/
+    install -m 0755 ${WORKDIR}/local_settings.py ${D}${APP_INSTALL_DIR}/
 
 
 
