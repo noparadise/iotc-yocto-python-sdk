@@ -26,6 +26,7 @@ RDEPENDS:${PN} += " python3-rsa"
 RDEPENDS:${PN} += " python3-urllib3"                 
 
 SRC_URI += " file://lora_demo.py"
+SRC_URI += " file://local_settings.py"
 SRC_URI += " file://models"
 SRC_URI += " file://helpers"
 
